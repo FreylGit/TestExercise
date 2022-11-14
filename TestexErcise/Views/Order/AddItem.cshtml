@@ -1,0 +1,17 @@
+﻿@model OrderItem
+@{
+}
+
+<form method="post"  asp-action="AddItem">
+    <input type="hidden" asp-for="OrderId"/>
+    <div class="form-group">
+        <label>Имя:</label><input type="text" asp-for="Name" value="" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Количество:</label><input type="text" asp-for="Quantity" value="" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Единицы измерения:</label><input type="text" asp-for="Unit" value="" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary" >Добавить в заказ</button>
+</form>

@@ -1,0 +1,66 @@
+﻿@model CreateOrderViewModel
+@using TestExercise.Models.ViewModels;
+
+@{
+    ViewData["Title"] = "Редактирование заказа";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <form method="post" asp-action="Edit" class="col-6">
+            <input type="hidden" asp-for="Order.Id"/>
+        <div class="form-group">
+            <label>Номер:</label><input type="number"  asp-for="Order.Number" class="form-control" />
+        </div>
+
+        <div class="form-group">
+                <label>Дата:</label><input type="date" asp-for="Order.Date"  class="form-control"  />
+        </div>
+            <div class="form-group">
+                <select class="form-select" aria-label="Default select example" asp-for="@Model.Order.ProviderId">
+                    <option selected>Поставщики</option>
+                    @foreach (var provider in Model.Providers)
+                    {
+                        <option value="@provider.Id">@provider.Name</option>
+                    }
+
+                </select>
+            </div>
+            <div class="btn-group mt-3">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <a class="btn btn-secondary" asp-action="AddItem" asp-route-id="@Model.Order.Id">Добавить в заказ</a>
+            </div>
+        </form>
+        <div class="row mt-4">
+
+            
+        @if (Model.Order.Items.Count() >0)
+        {
+            <table class="table table-dark">
+                <thead>
+                    <th>Имя:</th>
+                    <th>Количество:</th>
+                    <th>Единицы измерения:</th>
+                    <th></th>
+                </thead>
+                @foreach (var item in Model.Order.Items)
+                {
+                    <tbody>
+                        <td>@item.Name</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Unit</td>
+                        <td>
+                            <form asp-action="DeleteItem" asp-controller="Order" method="post">
+                                <input type="hidden" name="id" value="@item.Id"/>
+                                <button class="btn btn-danger">Удалить</button>
+                            </form>
+                        </td>
+                    </tbody>
+                }
+                
+            </table>
+        }
+        </div>
+    </div>
+</div>

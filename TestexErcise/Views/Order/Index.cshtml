@@ -4,7 +4,7 @@
 }
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-4">
+        <div class="col-3">
             <div class="form-group">
                 <label>Поставщик:</label><input type="text" asp-for="Provider.Name" class="form-control" readonly />
             </div>
@@ -14,7 +14,13 @@
             <div class="form-group">
                 <label>Дата:</label><input type="date" asp-for="Date"  class="form-control" readonly />
             </div>
+            <a class="btn btn-secondary mt-4 asp-action="Index" asp-controller="Home">Назад</a>
         </div>
+
+        </div>
+        <div class="row justify-content-center mt-5">
+
+        
         <div class="col-6">
             @if (Model.Items.Count() > 0)
             {
@@ -40,5 +46,7 @@
                 </table>
             }
         </div>
+       
     </div>
+    
 </div>

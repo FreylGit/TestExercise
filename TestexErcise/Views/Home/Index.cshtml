@@ -9,13 +9,22 @@
 <div class="container">
         <form method="post" asp-action="Filter">
         <div class="row justify-content-center">
-        <div class="col-4">
+        <div class="col-3">
                 <input type="date" class="form-control" name="date1"  asp-for="DateStart" />
             </div>
-        <div class="col-4">
+        <div class="col-3">
                 <input type="date" class="form-control" name="date2" asp-for="DateEnd" />
         </div>
-        <div class="col-4">
+            <div class="col-3">
+                <select class="form-select" aria-label="Default select example" name="filter" asp-for="@Model.Filter">
+                    <option selected>Сортировка</option>
+                    <option value="amount">По количеству</option>
+                    <option value="number">По номеру</option>
+                    <option value="date">По дате</option>
+
+                </select>
+            </div>
+        <div class="col-3">
             <button type="submit" class="btn btn-success" >Найти</button>
         </div>
         </div>

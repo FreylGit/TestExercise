@@ -33,17 +33,61 @@ namespace TestexErcise.Controllers
         }
 
         [HttpPost]
-        public IActionResult Filter(string date1, string date2)
+        public IActionResult Filter(string date1, string date2,string filter)
         {
+            _logger.LogInformation(filter);
             DateTime start = DateTime.Parse(date1);
             DateTime end = DateTime.Parse(date2);
-            var model = new OrderListViewModel()
+
+            if (filter == "number")
+            {//Костыли
+                var orders = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end))
+                               .OrderBy(o => Convert.ToInt32(o.Number));
+
+                var model = new OrderListViewModel()
+                {
+                    Orders = orders,
+                    DateStart = start,
+                    DateEnd = end,
+                };
+                return View("Index", model);
+            }
+            else if (filter == "date")
             {
-                Orders = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end)),
+                var orders = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end))
+                              .OrderBy(o => o.Date);
+
+                var model = new OrderListViewModel()
+                {
+                    Orders = orders,
+                    DateStart = start,
+                    DateEnd = end,
+                };
+                return View("Index", model);
+            }
+            else if(filter == "amount")
+            {
+                var orders = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end))
+                              .OrderByDescending(o => o.Items.Count());
+
+                var model = new OrderListViewModel()
+                {
+                    Orders = orders,
+                    DateStart = start,
+                    DateEnd = end,
+                };
+                return View("Index", model);
+            }
+            var ordersDefult = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end));
+                               
+
+            var modelDefult = new OrderListViewModel()
+            {
+                Orders = ordersDefult,
                 DateStart = start,
                 DateEnd = end,
             };
-            return View("Index", model);
+            return View("Index", modelDefult);
         }
         [HttpGet]
         public IActionResult CreateProvider()

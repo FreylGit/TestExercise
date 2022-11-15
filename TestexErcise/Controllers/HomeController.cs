@@ -20,7 +20,6 @@ namespace TestexErcise.Controllers
 
         public IActionResult Index()
         {
-
             DateTime startm = DateTime.Now.AddMonths(-1);
             var orders = _orderRepository.Orders;
             if (orders == null)
@@ -44,11 +43,14 @@ namespace TestexErcise.Controllers
                 return View(modelDefault);
             }
         }
+        /// <summary>
+        ///  Метод для сортировки списка
+        /// </summary>
 
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Filter(string date1, string date2, string filter)
         {
-            _logger.LogInformation(filter);
             DateTime start = DateTime.Parse(date1);
             DateTime end = DateTime.Parse(date2);
             //Костыли

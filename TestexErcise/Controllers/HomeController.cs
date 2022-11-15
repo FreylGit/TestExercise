@@ -20,27 +20,40 @@ namespace TestexErcise.Controllers
 
         public IActionResult Index()
         {
-           
-            DateTime startm = DateTime.Now.AddMonths(-1);
-            var modelDefault = new OrderListViewModel()
-            {
-                Orders = _orderRepository.Orders,
-                DateStart = startm,
-                DateEnd = DateTime.Now,
-            };
-            return View(modelDefault);
 
+            DateTime startm = DateTime.Now.AddMonths(-1);
+            var orders = _orderRepository.Orders;
+            if (orders == null)
+            {
+                var modelDefault = new OrderListViewModel()
+                {
+                    Orders = new List<Order>(),
+                    DateStart = startm,
+                    DateEnd = DateTime.Now,
+                };
+                return View(modelDefault);
+            }
+            else
+            {
+                var modelDefault = new OrderListViewModel()
+                {
+                    Orders = orders,
+                    DateStart = startm,
+                    DateEnd = DateTime.Now,
+                };
+                return View(modelDefault);
+            }
         }
 
         [HttpPost]
-        public IActionResult Filter(string date1, string date2,string filter)
+        public IActionResult Filter(string date1, string date2, string filter)
         {
             _logger.LogInformation(filter);
             DateTime start = DateTime.Parse(date1);
             DateTime end = DateTime.Parse(date2);
-
+            //Костыли
             if (filter == "number")
-            {//Костыли
+            {
                 var orders = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end))
                                .OrderBy(o => Convert.ToInt32(o.Number));
 
@@ -65,7 +78,7 @@ namespace TestexErcise.Controllers
                 };
                 return View("Index", model);
             }
-            else if(filter == "amount")
+            else if (filter == "amount")
             {
                 var orders = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end))
                               .OrderByDescending(o => o.Items.Count());
@@ -79,7 +92,7 @@ namespace TestexErcise.Controllers
                 return View("Index", model);
             }
             var ordersDefult = _orderRepository.Orders.Where(o => (o.Date >= start) && (o.Date <= end));
-                               
+
 
             var modelDefult = new OrderListViewModel()
             {
@@ -97,13 +110,13 @@ namespace TestexErcise.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProvider(Provider provider)
         {
-           if( await _providerRepository.AddAsync(provider))
+            if (await _providerRepository.AddAsync(provider))
             {
                 return RedirectToAction("Index");
             }
             return View(provider);
-          
+
         }
-        
+
     }
 }

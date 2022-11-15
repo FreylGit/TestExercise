@@ -25,18 +25,22 @@ namespace TestExercise.Controllers
             return new NotFoundResult();
         }
         [HttpGet]
-        public async Task< IActionResult> CreateOrder()
+        public async Task<IActionResult> CreateOrder()
         {
-            if (_providerRepository.Providers.Count() == 0)//Затычка для теста ( можно создать поставщика через ссылку в меню)
+            if (_providerRepository.Providers != null)
             {
-               await _providerRepository.AddAsync(new Provider { Name = "Test" });
+                if (_providerRepository.Providers.Count() == 0)//Затычка для теста ( можно создать поставщика через ссылку в меню)
+                {
+                    await _providerRepository.AddAsync(new Provider { Name = "Test" });
+                }
+                var model = new CreateOrderViewModel()
+                {
+                    Order = new Order(),
+                    Providers = _providerRepository.Providers
+                };
+                return View(model);
             }
-            var model = new CreateOrderViewModel()
-            {
-                Order = new Order(),
-                Providers = _providerRepository.Providers
-            };
-            return View(model);
+            return new BadRequestResult();
         }
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderViewModel model)

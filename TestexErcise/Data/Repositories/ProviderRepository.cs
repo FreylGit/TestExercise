@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using TestexErcise.Data;
+﻿using TestexErcise.Data;
 using TestExercise.Data.Repositories.Interfaces;
 using TestExercise.Models;
 
 namespace TestExercise.Data.Repositories
 {
-    public class ProviderRepository : IProviderRepository
+    public class ProviderRepository : Repository, IProviderRepository
     {
         private readonly ApplicationDbContext _context;
         public ProviderRepository(ApplicationDbContext context)
@@ -13,15 +12,20 @@ namespace TestExercise.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Provider> Providers => _context.Providers;
+        public IQueryable<Provider> Providers => CheckConnectDatabase(_context) ? _context.Providers : null;
 
         public async Task<bool> AddAsync(Provider model)
         {
             try
             {
-                await _context.Providers.AddAsync(model);
-                await _context.SaveChangesAsync();
-                return true;
+                if (CheckConnectDatabase(_context))
+                {
+                    await _context.Providers.AddAsync(model);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                return false;   
+                
             }
             catch (Exception ex)
             {
@@ -34,12 +38,16 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
+                if (CheckConnectDatabase(_context))
+                {
                 var model = _context.Providers.FirstOrDefault(p => p.Id == id);
                 if (model == null)
                 {
                     return null;
                 }
                 return model;
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -51,10 +59,13 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
-                if (_context.Providers.Remove(model) != null)
+                if (CheckConnectDatabase(_context))
                 {
-                    await _context.SaveChangesAsync();
-                    return true;
+                    if (_context.Providers.Remove(model) != null)
+                    {
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
                 }
                 return false;
 
@@ -69,10 +80,13 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
-                if (_context.Providers.Update(model) != null)
+                if (CheckConnectDatabase(_context))
+                {
+                    if (_context.Providers.Update(model) != null)
                 {
                     await _context.SaveChangesAsync();
                     return true;
+                }
                 }
                 return false;
             }

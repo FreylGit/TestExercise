@@ -5,7 +5,7 @@ using TestExercise.Models;
 
 namespace TestExercise.Data.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository : Repository,IOrderRepository
     {
         private readonly ApplicationDbContext _context;
         public OrderRepository(ApplicationDbContext context)
@@ -13,19 +13,21 @@ namespace TestExercise.Data.Repositories
             _context = context;
         }
 
-        public IQueryable<Order> Orders => _context.Orders.Include(o => o.Items).Include(o => o.Provider);
+        public IQueryable<Order> Orders => CheckConnectDatabase(_context) ? _context.Orders.Include(o => o.Items).Include(o => o.Provider) :null;
 
         public async Task<bool> AddOrderAsync(Order model)
         {
             try
             {
-
-                if (Orders.FirstOrDefault(o => o.Number == model.Number && o.ProviderId == model.ProviderId) == null)
+                if (CheckConnectDatabase(_context))
                 {
-                    await _context.Orders.AddAsync(model);
-                    await _context.SaveChangesAsync();
+                    if (Orders.FirstOrDefault(o => o.Number == model.Number && o.ProviderId == model.ProviderId) == null)
+                    {
+                        await _context.Orders.AddAsync(model);
+                        await _context.SaveChangesAsync();
 
-                    return true;
+                        return true;
+                    } 
                 }
                 return false;
 
@@ -40,16 +42,20 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
-                model.Id = 0;
-                var order = _context.Orders.FirstOrDefault(o=>o.Id==model.OrderId);
-                if(order.Number!= model.Name)
+                if (CheckConnectDatabase(_context))
                 {
-                    await _context.OrderItems.AddAsync(model);
-                    await _context.SaveChangesAsync();
-                    return true;
+                    model.Id = 0;
+                    var order = _context.Orders.FirstOrDefault(o => o.Id == model.OrderId);
+                    if (order.Number != model.Name)
+                    {
+                        await _context.OrderItems.AddAsync(model);
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
                 }
+                   
                 return false;
-               
+
             }
             catch (Exception ex) { return false; }
 
@@ -59,12 +65,17 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
-                var model = await Orders.FirstOrDefaultAsync(o => o.Id == id);
-                if (model.Items == null)
+                if (CheckConnectDatabase(_context))
                 {
-                    model.Items = new List<OrderItem>();
+                    var model = await Orders.FirstOrDefaultAsync(o => o.Id == id);
+                    if (model.Items == null)
+                    {
+                        model.Items = new List<OrderItem>();
+                    }
+                    return model;
                 }
-                return model;
+                return null;
+
             }
             catch (Exception ex) { return null; }
         }
@@ -73,25 +84,33 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
-                var model = _context.OrderItems.FirstOrDefaultAsync(i=>i.Id == id);
-                if (model != null)
+                if (CheckConnectDatabase(_context))
                 {
-                    return model;
-                }
+                    var model = _context.OrderItems.FirstOrDefaultAsync(i => i.Id == id);
+                    if (model != null)
+                    {
+                        return model;
+                    }
+                } 
                 return null;
-            }catch(Exception ex) { return null; }
+            }
+            catch (Exception ex) { return null; }
         }
 
         public async Task<bool> RemoveOrderAsync(int id)
         {
             try
             {
-                var model = _context.Orders.FirstOrDefault(o => o.Id == id);
-                if (_context.Orders.Remove(model) != null)
+                if (CheckConnectDatabase(_context))
                 {
-                    await _context.SaveChangesAsync();
-                    return true;
+                    var model = _context.Orders.FirstOrDefault(o => o.Id == id);
+                    if (_context.Orders.Remove(model) != null)
+                    {
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
                 }
+                   
                 return false;
             }
             catch (Exception ex) { return false; }
@@ -101,24 +120,33 @@ namespace TestExercise.Data.Repositories
         {
             try
             {
-                var model = _context.OrderItems.FirstOrDefault(i=>i.Id== id);
-                if (model != null)
+                if (CheckConnectDatabase(_context))
                 {
-                    _context.OrderItems.Remove(model);
-                    await _context.SaveChangesAsync();
-                    return true;
+                    var model = _context.OrderItems.FirstOrDefault(i => i.Id == id);
+                    if (model != null)
+                    {
+                        _context.OrderItems.Remove(model);
+                        await _context.SaveChangesAsync();
+                        return true;
+                    }
                 }
+                   
                 return false;
-            }catch(Exception ex) { return false; }
+            }
+            catch (Exception ex) { return false; }
         }
 
         public async Task<bool> UpdateOrderAsync(Order model)
         {
             try
             {
-                _context.Orders.Update(model);
-                await _context.SaveChangesAsync();
-                return true;
+                if (CheckConnectDatabase(_context))
+                {
+                    _context.Orders.Update(model);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                return false;
             }
             catch (Exception e) { return false; }
         }

@@ -4,6 +4,6 @@
     {
         public Order Order { get; set; }
         public IEnumerable<Provider> Providers { get; set; }
-        public string ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; }
     }
 }

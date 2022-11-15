@@ -21,7 +21,7 @@ namespace TestExercise.Data.Repositories
             {
                 if (CheckConnectDatabase(_context))
                 {
-                    if (Orders.FirstOrDefault(o => o.Number == model.Number && o.ProviderId == model.ProviderId) == null)
+                    if (!(Convert.ToUInt32(model.Number) == model.ProviderId))
                     {
                         await _context.Orders.AddAsync(model);
                         await _context.SaveChangesAsync();

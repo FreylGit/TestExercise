@@ -4,5 +4,5 @@
 * MSSQL + Miscrosoft SQL Server Management Studio 18
 * EntityFrameworkCore
 
-##Для запуска проекта
+# Для запуска проекта
 * Прописать update-database в консоли диспетчера пакетов
